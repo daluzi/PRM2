@@ -158,11 +158,14 @@ class PRM2:
 				u1 = np.zeros((1, 10))
 				u5 = np.zeros((1, 10))
 				u6 = np.zeros((1, 10))
+				u2 = np.zeros((1, 10))
+				u3 = np.zeros((1, 10))
+				u4 = np.zeros((1, 10))
 				for j_u in range(n):
 					if I[i_u][j_u] != 0:
 						u1 = u1 + (R1[i_u][j_u] - R[i_u][j_u]) * V[j_u,:]
 						u6 = u6 + np.sum(I[i_u, :]) * (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u]) * V[j_u, :]
-				# 		print(V[j_u:,].shape)
+						#print(V[j_u:,].shape)
 					for j_u in range(m):
 						u51 = np.zeros((1, 10))
 						for jj_u in range(m):
@@ -175,9 +178,7 @@ class PRM2:
 				u1 = u1 + 0.1 * U[i_u,:]
 				print(u1.shape)
 
-				u2 = np.zeros((1, 10))
-				u3 = np.zeros((1, 10))
-				u4 = np.zeros((1, 10))
+
 				for j_u in range(m):
 					if W[i_u][j_u-1] != 0:
 						u2 = u2 + np.sum(I[j_u]) * U[j_u,:]
