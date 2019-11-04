@@ -165,37 +165,28 @@ class PRM2:
 					if I[i_u][j_u] != 0:
 						u1 = u1 + (R1[i_u][j_u] - R[i_u][j_u]) * V[j_u,:]
 						u6 = u6 + np.sum(I[i_u, :]) * (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u]) * V[j_u, :]
-						#print(V[j_u:,].shape)
-					for j_u in range(m):
-						u51 = np.zeros((1, 10))
-						for jj_u in range(m):
-							if W[j_u][jj_u] != 0:
-								u51 = u51 + simiX[j_u, jj_u] * U[jj_u,:]
-						if W[i_u][j_u] != 0:
-							u5 = u5 + simiX[i_u, j_u] * u51
-				u51 = gama * u5
-
-				u1 = u1 + 0.1 * U[i_u,:]
-				print(u1.shape)
-
-
 				for j_u in range(m):
 					if W[i_u][j_u-1] != 0:
 						u2 = u2 + np.sum(I[j_u]) * U[j_u,:]
 						u4 = u4 + simiX[i_u,j_u] * U[j_u,:]
+					u51 = np.zeros((1, 10))
 					u31 = np.zeros((1, 10))
 					for jj_u in range(m):
-						if W[j_u][jj_u - 1] != 0:
-							# print(I[jj_u])
+						if W[j_u][jj_u] != 0:
+							u51 = u51 + simiX[j_u, jj_u] * U[jj_u, :]
 							u31 = u31 + np.sum(I[jj_u]) * U[jj_u, :]
 					if W[i_u][j_u] != 0:
+						u5 = u5 + simiX[i_u, j_u] * u51
 						u3 = u3 + np.sum(I[j_u]) * u31
+				u1 = u1 + 0.1 * U[i_u, :]
 				u21 = beita * (U[i_u,:] - u2)
 				u32 = beita * u3
 				u41 = gama * (U[i_u,:] - u4)
+				u51 = gama * u5
 				u61 = yinta * u6
 
 				U[i_u,:] = U[i_u,:] - l * (u1 + u21 - u32 - u51 + u41 + u61)
+				print("嘿")
 
 			#V
 			for i_v in range(n):
