@@ -145,6 +145,7 @@ class PRM2:
 
 		#这里可以通过KNN找到user的朋友矩阵
 		simiX = trainW(R)
+		print("simiX:\t",simiX.shape)
 		W = myKNN(simiX, 5)
 		print(W.shape)
 		# print("w:",W)
@@ -161,11 +162,11 @@ class PRM2:
 				u2 = np.zeros((1, 10))
 				u3 = np.zeros((1, 10))
 				u4 = np.zeros((1, 10))
-				for j_u in range(n):
+
+				for j_u in range(m):
 					if I[i_u][j_u] != 0:
 						u1 = u1 + (R1[i_u][j_u] - R[i_u][j_u]) * V[j_u,:]
 						u6 = u6 + np.sum(I[i_u, :]) * (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u]) * V[j_u, :]
-				for j_u in range(m):
 					if W[i_u][j_u-1] != 0:
 						u2 = u2 + np.sum(I[j_u]) * U[j_u,:]
 						u4 = u4 + simiX[i_u,j_u] * U[j_u,:]
@@ -186,16 +187,16 @@ class PRM2:
 				u61 = yinta * u6
 
 				U[i_u,:] = U[i_u,:] - l * (u1 + u21 - u32 - u51 + u41 + u61)
-				print("嘿")
+				# print("嘿")
 
 			#V
 			for i_v in range(n):
 				v1 = np.zeros((1, 10))
 				v2 = np.zeros((1, 10))
 				for j_v in range(m):
-					v1 = np.sum(I[j_v,:]) * (R1[i_v][j_v] - R[i_v][j_v]) * U[j_v,:]
-					if I[i_v][j_v] != 0:
-						v2 = v2 + np.sum(I[i_v,:]) * (np.dot(U[i_v,:], V[j_v,:].T) - simiX[i_v, j_v]) * U[j_v,:]
+					v1 = np.sum(I[j_v,:]) * (R1[j_v][i_v] - R[j_v][i_v]) * U[j_v,:]
+					if I[j_v][i_v] != 0:
+						v2 = v2 + np.sum(I[j_v,:]) * (np.dot(U[j_v,:], V[i_v,:].T) - simiX[j_v, j_v]) * U[j_v,:]
 				v1 = v1 + 0.1 * V[i_v,:]
 				v21 = yinta * v2
 
