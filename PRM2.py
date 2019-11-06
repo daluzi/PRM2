@@ -156,22 +156,24 @@ class PRM2:
 			R1 = [[R1[i][j] + r for j in range(len(R1[i]))] for i in range(len(R1))]
 			# U
 			for i_u in range(m):
-				u1 = np.zeros((1, 10))
-				u5 = np.zeros((1, 10))
-				u6 = np.zeros((1, 10))
-				u2 = np.zeros((1, 10))
-				u3 = np.zeros((1, 10))
-				u4 = np.zeros((1, 10))
+				u1 = np.zeros((1, 10),dtype='float64')
+				u5 = np.zeros((1, 10),dtype='float64')
+				u6 = np.zeros((1, 10),dtype='float64')
+				u2 = np.zeros((1, 10),dtype='float64')
+				u3 = np.zeros((1, 10),dtype='float64')
+				u4 = np.zeros((1, 10),dtype='float64')
 
 				for j_u in range(m):
 					if I[i_u][j_u] != 0:
+						# print(R1[i_u][j_u] - R[i_u][j_u])
+						# print(V[j_u,:])
 						u1 = u1 + (R1[i_u][j_u] - R[i_u][j_u]) * V[j_u,:]
 						u6 = u6 + np.sum(I[i_u, :]) * (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u]) * V[j_u, :]
 					if W[i_u][j_u-1] != 0:
 						u2 = u2 + np.sum(I[j_u]) * U[j_u,:]
 						u4 = u4 + simiX[i_u,j_u] * U[j_u,:]
-					u51 = np.zeros((1, 10))
-					u31 = np.zeros((1, 10))
+					u51 = np.zeros((1, 10),dtype='float64')
+					u31 = np.zeros((1, 10),dtype='float64')
 					for jj_u in range(m):
 						if W[j_u][jj_u] != 0:
 							u51 = u51 + simiX[j_u, jj_u] * U[jj_u, :]
@@ -191,10 +193,11 @@ class PRM2:
 
 			#V
 			for i_v in range(n):
-				v1 = np.zeros((1, 10))
-				v2 = np.zeros((1, 10))
+				v1 = np.zeros((1, 10),dtype='float64')
+				v2 = np.zeros((1, 10),dtype='float64')
 				for j_v in range(m):
-					v1 = np.sum(I[j_v,:]) * (R1[j_v][i_v] - R[j_v][i_v]) * U[j_v,:]
+					sub_v1 = (R1[j_v][i_v] - R[j_v][i_v]) * U[j_v,:]
+					v1 = np.sum(I[j_v,:]) * sub_v1
 					if I[j_v][i_v] != 0:
 						v2 = v2 + np.sum(I[j_v,:]) * (np.dot(U[j_v,:], V[i_v,:].T) - simiX[j_v, j_v]) * U[j_v,:]
 				v1 = v1 + 0.1 * V[i_v,:]
