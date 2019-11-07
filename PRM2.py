@@ -26,7 +26,7 @@ def ReadTxtData(filePath):
 	return resultData
 
 #处理原始数据
-def ProData(dataSet):
+def ProData(dataSet,rowNum,cluNum):
 	dataSetSecondColu = []
 	for i in range(len(dataSet)):
 		dataSetSecondColu.append(dataSet[i][1])
@@ -35,7 +35,7 @@ def ProData(dataSet):
 	dataSetSecondColu.sort()  # 排序
 	print(dataSetSecondColu)
 	# print("下标:\n",dataSetSecondColu.index(149532))
-	user_item_matrix = np.zeros((1624, 1672))
+	user_item_matrix = np.zeros((rowNum, cluNum))
 
 	dataSet = [np.array(list(map(lambda x: float32(x), dataSet[i]))) for i in range(len(dataSet))]  # 字符数组转化为数字数组
 	dataSet = np.array(dataSet)
@@ -114,9 +114,9 @@ def myKNN(S, k):
 
 class PRM2:
 
-	def __init__(self,filepath,k):
+	def __init__(self,filepath,k,rowNum,cluNum):
 		readData = ReadTxtData(filepath)#读取文件'
-		r, train, test = ProData(readData)
+		r, train, test = ProData(readData,rowNum,cluNum)
 		U, V = self.Update(train, k, r, 30, 30, 30, 0.0001)
 		print("----------------------------------------------")
 		print("U:\n",U)
@@ -167,20 +167,20 @@ class PRM2:
 					if I[i_u][j_u] != 0:
 						# print(R1[i_u][j_u] - R[i_u][j_u])
 						# print(V[j_u,:])
-						u1 = u1 + (R1[i_u][j_u] - R[i_u][j_u]) * V[j_u,:]
-						u6 = u6 + np.sum(I[i_u, :]) * (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u]) * V[j_u, :]
+						u1 = u1 + np.dot((R1[i_u][j_u] - R[i_u][j_u]) , V[j_u,:])
+						u6 = u6 + np.dot(np.dot(np.sum(I[i_u, :]) , (np.dot(U[i_u, :], V[j_u, :].T) - simiX[i_u, j_u])) , V[j_u, :])
 					if W[i_u][j_u-1] != 0:
-						u2 = u2 + np.sum(I[j_u]) * U[j_u,:]
-						u4 = u4 + simiX[i_u,j_u] * U[j_u,:]
+						u2 = u2 + np.dot(np.sum(I[j_u]) , U[j_u,:])
+						u4 = u4 + np.dot(simiX[i_u,j_u] , U[j_u,:])
 					u51 = np.zeros((1, 10),dtype='float64')
 					u31 = np.zeros((1, 10),dtype='float64')
 					for jj_u in range(m):
 						if W[j_u][jj_u] != 0:
-							u51 = u51 + simiX[j_u, jj_u] * U[jj_u, :]
-							u31 = u31 + np.sum(I[jj_u]) * U[jj_u, :]
+							u51 = u51 + np.dot(simiX[j_u, jj_u] , U[jj_u, :])
+							u31 = u31 + np.dot(np.sum(I[jj_u]) , U[jj_u, :])
 					if W[i_u][j_u] != 0:
-						u5 = u5 + simiX[i_u, j_u] * u51
-						u3 = u3 + np.sum(I[j_u]) * u31
+						u5 = u5 + np.dot(simiX[i_u, j_u] , u51)
+						u3 = u3 + np.dot(np.sum(I[j_u]) , u31)
 				u1 = u1 + 0.1 * U[i_u, :]
 				u21 = beita * (U[i_u,:] - u2)
 				u32 = beita * u3
@@ -196,14 +196,14 @@ class PRM2:
 				v1 = np.zeros((1, 10),dtype='float64')
 				v2 = np.zeros((1, 10),dtype='float64')
 				for j_v in range(m):
-					sub_v1 = (R1[j_v][i_v] - R[j_v][i_v]) * U[j_v,:]
-					v1 = np.sum(I[j_v,:]) * sub_v1
+					sub_v1 = np.dot((R1[j_v][i_v] - R[j_v][i_v]) , U[j_v,:])
+					v1 = np.dot(np.sum(I[j_v,:]) , sub_v1)
 					if I[j_v][i_v] != 0:
-						v2 = v2 + np.sum(I[j_v,:]) * (np.dot(U[j_v,:], V[i_v,:].T) - simiX[j_v, j_v]) * U[j_v,:]
+						v2 = v2 + np.dot(np.dot(np.sum(I[j_v,:]) , (np.dot(U[j_v,:], V[i_v,:].T) - simiX[j_v, j_v])) , U[j_v,:])
 				v1 = v1 + 0.1 * V[i_v,:]
 				v21 = yinta * v2
 
-				V[i_v,:] = V[i_v,:] - l * (v1 + v21)
+				V[i_v,:] = V[i_v,:] - np.dot(l , (v1 + v21))
 			print("run%d" % i)
 
 		return U, V
@@ -212,7 +212,7 @@ class PRM2:
 if __name__ == '__main__':
 	filePath = './Yelp/pets/ratings.txt'
 	k = 10
-	prm2 = PRM2(filePath, k)
+	prm2 = PRM2(filePath, k, 1624, 1672)
 	# newX = [[sr1.new[i][j] + sr1.r for j in range(len(sr1.new[i]))] for i in range(len(sr1.new))]  # 每个元素累加r
 	newX = prm2.new
 	xiabao = np.argwhere(prm2.test > 0)  # 获取测试集中值大于0的元素的下标
